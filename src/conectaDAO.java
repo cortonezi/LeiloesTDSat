@@ -1,15 +1,5 @@
-
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import javax.swing.JOptionPane;
-
-
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 
 /**
  *
@@ -17,17 +7,23 @@ import javax.swing.JOptionPane;
  */
 public class conectaDAO {
     
-    public Connection connectDB(){
-        Connection conn = null;
+    // Método responsável pela conexão com o banco
+    public static Connection conector() {
+        Connection conexao = null;
+        String driver = "com.mysql.cj.jdbc.Driver";
+        String url = "jdbc:mysql://127.0.0.1:3306/uc11?useSSL=false";  // Desativando o uso de SSL
+        String user = "root";
+        String password = "123456";
         
+        // Estabelecendo a conexão com o banco        
         try {
-        
-            conn = DriverManager.getConnection("jdbc:mysql://localhost/uc11?user=root&password=");
-            
-        } catch (SQLException erro){
-            JOptionPane.showMessageDialog(null, "Erro ConectaDAO" + erro.getMessage());
+            Class.forName(driver);
+            conexao = DriverManager.getConnection(url, user, password);
+            return conexao;
+        } catch (Exception e) {
+            // A linha abaixo serve para mostrar o erro de conexão
+            System.out.println("Erro de conexão: " + e);
+            return null;
         }
-        return conn;
     }
-    
 }

@@ -1,19 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.JOptionPane;
 
-/**
- *
- * @author Adm
- */
 public class cadastroVIEW extends javax.swing.JFrame {
+
+    Connection conexao = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
 
     /**
      * Creates new form cadastroVIEW
      */
     public cadastroVIEW() {
         initComponents();
+
+        conexao = conectaDAO.conector();
     }
 
     /**
@@ -140,16 +142,49 @@ public class cadastroVIEW extends javax.swing.JFrame {
     }//GEN-LAST:event_cadastroNomeActionPerformed
 
     private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed
-        ProdutosDTO produto = new ProdutosDTO();
+        // Recuperando os valores dos campos de texto
         String nome = cadastroNome.getText();
         String valor = cadastroValor.getText();
-        String status = "A Venda";
-        produto.setNome(nome);
-        produto.setValor(Integer.parseInt(valor));
-        produto.setStatus(status);
-        
-        ProdutosDAO produtodao = new ProdutosDAO();
-        produtodao.cadastrarProduto(produto);
+        String status = "A Venda"; // Definindo o status padrão como "A Venda"
+
+        // Verificando se os campos não estão vazios
+        if (nome.isEmpty() || valor.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor, preencha todos os campos!");
+            return;
+        }
+
+        // Criando a query SQL para inserção
+        String sql = "INSERT INTO produtos (nome, valor, status) VALUES (?, ?, ?)";
+
+        try {
+            // Preparando a query
+            pst = conexao.prepareStatement(sql);
+            pst.setString(1, nome);
+            pst.setInt(2, Integer.parseInt(valor));
+            pst.setString(3, status);
+
+            // Executando a query
+            int adicionado = pst.executeUpdate();
+
+            // Verificando se o produto foi adicionado
+            if (adicionado > 0) {
+                JOptionPane.showMessageDialog(null, "Produto cadastrado com sucesso!");
+                // Limpar os campos após a inserção
+                cadastroNome.setText("");
+                cadastroValor.setText("");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        } finally {
+            try {
+                if (pst != null) {
+                    pst.close();
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
         
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
